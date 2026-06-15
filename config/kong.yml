@@ -1,0 +1,22 @@
+_format_version: "3.0"
+
+upstreams:
+  - name: loadbalancing-upstream
+    targets:
+      - target: service-loadbalancing-1:8081    # Porta del container
+        weight: 100
+      - target: service-loadbalancing-2:8081
+        weight: 100
+      - target: service-loadbalancing-3:8081
+        weight: 100
+
+services:
+  - name: loadbalancing-service
+    protocol: http
+    host: loadbalancing-upstream
+    port: 8081    # Stessa porta su cui ascoltano i microservizi loadbalancing
+    routes:
+      - name: loadbalancing-route
+        paths:
+          - /loadbalancing
+        strip_path: false
