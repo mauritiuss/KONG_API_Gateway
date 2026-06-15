@@ -1,0 +1,43 @@
+services:
+  kong-loadbalancing:
+    image: kong:latest
+    container_name: kong-loadbalancing
+    environment:
+      KONG_DATABASE: off
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+    volumes:
+      - ./config/kong.yml:/kong/declarative/kong.yml
+    ports:
+      - "8000:8000"   # Porta per i client
+      - "8001:8001"   # Porta per admin
+    depends_on:
+      - service-loadbalancing-1
+      - service-loadbalancing-2
+      - service-loadbalancing-3
+
+
+  service-loadbalancing-1:
+    build:
+      context: ./services/service-loadbalancing/
+    container_name: service-loadbalancing-1
+    environment:
+      SERVICE_NAME: service-1
+    ports:
+      - "8081:8081"   # Porta per test
+  service-loadbalancing-2:
+    build:
+      context: ./services/service-loadbalancing/
+    container_name: service-loadbalancing-2
+    environment:
+      SERVICE_NAME: service-2
+
+  service-loadbalancing-3:
+    build:
+      context: ./services/service-loadbalancing/
+    container_name: service-loadbalancing-3
+    environment:
+      SERVICE_NAME: service-3
