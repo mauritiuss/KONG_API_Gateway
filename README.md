@@ -18,7 +18,7 @@ Tutti i servizi vengono eseguiti tramite Docker Compose e sono accesibili attrav
 Questo servizio viene eseguito tramite più istanze identiche.
 L'obiettivo è dimostrare il funzionamento del load balancing, mostrare come Kong distribuisce le richieste tra più repliche e verificare che richieste consecutive possano essere gestite da istanze diverse.
 
-La presenza di più istanze consente inoltre di mostrare uan forma di fault tolerance infrastrutturale: se una replica dovesse smettere di funzionare, le richieste vengono inoltrate alle istanze ancora attive, garantendo continuità.
+La presenza di più istanze consente inoltre di mostrare una forma di fault tolerance infrastrutturale: se una replica dovesse smettere di funzionare, le richieste vengono inoltrate alle istanze ancora attive, garantendo continuità.
 
 ### Service 2 - Security
 Servizio dedicato alla protezione delle API.
