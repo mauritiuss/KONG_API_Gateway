@@ -1,0 +1,12 @@
+_format_version: "3.0"
+
+services:
+  - name: faulttolerance-service
+    protocol: http
+    host: service-faulttolerance
+    port: 8084
+    routes:
+      - name: faulttolerance-route
+        paths:
+          - /faulttolerance
+        strip_path: false

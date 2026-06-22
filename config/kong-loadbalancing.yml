@@ -2,6 +2,24 @@ _format_version: "3.0"
 
 upstreams:
   - name: loadbalancing-upstream
+    healthchecks:
+      active:
+        type: http
+        http_path: /loadbalancing
+        healthy:
+          interval: 5
+          successes: 1
+        unhealthy:
+          interval: 5
+          http_failures: 2
+          tcp_failures: 2
+          timeouts: 2
+
+      passive:
+        unhealthy:
+          http_failures: 2
+          tcp_failures: 2
+          timeouts: 2
     targets:
       - target: service-loadbalancing-1:8081    # Porta del container
         weight: 100
@@ -15,6 +33,10 @@ services:
     protocol: http
     host: loadbalancing-upstream
     port: 8081    # Stessa porta su cui ascoltano i microservizi loadbalancing
+    retries: 3    # --> Se una replica fallisce, Kong può ritentare la richiesta
+    connect_timeout: 3000    # --> Se non riesce a connettersi entro 3 secondi, considera fallita la connessione
+    read_timeout: 3000    # --> Se la replica riceve la richiesta ma non risponde entro 3 secondi, Kong considera la risposta fallita
+    write_timeout: 3000   # --> Se Kong non riesce a inviare la richeista alla replica entro 3 secondi, considera fallita
     routes:
       - name: loadbalancing-route
         paths:

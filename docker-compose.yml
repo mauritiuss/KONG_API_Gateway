@@ -33,8 +33,6 @@ services:
       SERVICE_NAME: service-1
     networks:
       - load-balancing-network
-    ports:
-      - "8081:8081"   # Porta per test
   # ------------
   service-loadbalancing-2:
     build:
@@ -88,8 +86,42 @@ services:
       - rate-limiting-network
 
 
+
+  # ---------------
+  # FAULT TOLERANCE
+  # ---------------
+  kong-faulttolerance:
+    image: kong:latest
+    container_name: kong-faulttolerance
+    environment:
+      KONG_DATABASE: off
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong-faulttolerance.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+    volumes:
+      - ./config/kong-faulttolerance.yml:/kong/declarative/kong-faulttolerance.yml
+    ports:
+      - "8004:8000"   # Porta per i client
+    depends_on:
+      - service-faulttolerance
+    networks:
+      - fault-tolerance-network
+
+  # ------------
+  service-faulttolerance:
+    build:
+      context: ./services/service-faulttolerance/
+    container_name: service-faulttolerance
+    networks:
+      - fault-tolerance-network
+
+
 networks:
   load-balancing-network:
     driver: bridge
   rate-limiting-network:
+    driver: bridge
+  fault-tolerance-network:
     driver: bridge

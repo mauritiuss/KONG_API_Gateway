@@ -2,7 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/services/service-loadbalancing" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/services/service-ratelimiting" vcs="Git" />
   </component>
 </project>
