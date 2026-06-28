@@ -1,0 +1,96 @@
+_format_version: "3.0"
+
+upstreams:
+  - name: loadbalancing-upstream
+    healthchecks:
+      active:
+        type: http
+        http_path: /loadbalancing
+        healthy:
+          interval: 5
+          successes: 1
+        unhealthy:
+          interval: 5
+          http_failures: 2
+          tcp_failures: 2
+          timeouts: 2
+      passive:
+        unhealthy:
+          http_failures: 2
+          tcp_failures: 2
+          timeouts: 2
+    targets:
+      - target: service-loadbalancing-1:8081
+        weight: 100
+      - target: service-loadbalancing-2:8081
+        weight: 100
+      - target: service-loadbalancing-3:8081
+        weight: 100
+
+services:
+  - name: loadbalancing-service
+    protocol: http
+    host: loadbalancing-upstream
+    port: 8081
+    retries: 2
+    connect_timeout: 3000
+    read_timeout: 3000
+    write_timeout: 3000
+    routes:
+      - name: loadbalancing-route
+        paths:
+          - /loadbalancing
+        strip_path: false
+
+  - name: security-service
+    protocol: http
+    host: service-security
+    port: 8082
+    routes:
+      - name: login-route
+        paths:
+          - /login
+        strip_path: false
+      - name: security-route
+        paths:
+          - /security
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              claims_to_verify:
+                - exp
+
+  - name: ratelimiting-service
+    protocol: http
+    host: service-ratelimiting
+    port: 8083
+    routes:
+      - name: ratelimiting-route
+        paths:
+          - /ratelimiting
+        strip_path: false
+
+  - name: faulttolerance-service
+    protocol: http
+    host: service-faulttolerance
+    port: 8084
+    routes:
+      - name: faulttolerance-route
+        paths:
+          - /faulttolerance
+        strip_path: false
+
+plugins:
+  - name: rate-limiting
+    service: ratelimiting-service
+    config:
+      minute: 3
+      policy: local
+
+consumers:
+  - username: user-demo
+    jwt_secrets:
+      - key: user-demo
+        secret: my-jwt-sercret
+        algorithm: HS256
