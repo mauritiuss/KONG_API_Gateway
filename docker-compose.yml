@@ -1,30 +1,62 @@
 services:
 
-  # ------------
-  # LOAD BALANCE
-  # ------------
-  kong-loadbalancing:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-gateway
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8000:80"
+    depends_on:
+      - kong-1
+      - kong-2
+    networks:
+      - api-gateway-network
+
+  kong-1:
     image: kong:latest
-    container_name: kong-loadbalancing
+    container_name: kong-1
     environment:
       KONG_DATABASE: off
-      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong-loadbalancing.yml
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ADMIN_ERROR_LOG: /dev/stderr
     volumes:
-      - ./config/kong-loadbalancing.yml:/kong/declarative/kong-loadbalancing.yml
-    ports:
-      - "8000:8000"   # Porta per i client
+      - ./config/kong.yml:/kong/declarative/kong.yml
     depends_on:
       - service-loadbalancing-1
       - service-loadbalancing-2
       - service-loadbalancing-3
+      - service-security
+      - service-ratelimiting
+      - service-faulttolerance
     networks:
-      - load-balancing-network
+      - api-gateway-network
 
-  # ------------
+  kong-2:
+    image: kong:latest
+    container_name: kong-2
+    environment:
+      KONG_DATABASE: off
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+    volumes:
+      - ./config/kong.yml:/kong/declarative/kong.yml
+    depends_on:
+      - service-loadbalancing-1
+      - service-loadbalancing-2
+      - service-loadbalancing-3
+      - service-security
+      - service-ratelimiting
+      - service-faulttolerance
+    networks:
+      - api-gateway-network
+
   service-loadbalancing-1:
     build:
       context: ./services/service-loadbalancing/
@@ -32,8 +64,8 @@ services:
     environment:
       SERVICE_NAME: service-1
     networks:
-      - load-balancing-network
-  # ------------
+      - api-gateway-network
+
   service-loadbalancing-2:
     build:
       context: ./services/service-loadbalancing/
@@ -41,8 +73,8 @@ services:
     environment:
       SERVICE_NAME: service-2
     networks:
-      - load-balancing-network
-  # ------------
+      - api-gateway-network
+
   service-loadbalancing-3:
     build:
       context: ./services/service-loadbalancing/
@@ -50,78 +82,29 @@ services:
     environment:
       SERVICE_NAME: service-3
     networks:
-      - load-balancing-network
-  # ------------
+      - api-gateway-network
 
-
-
-  # ------------
-  # RATE LIMIT
-  # ------------
-  kong-ratelimiting:
-    image: kong:latest
-    container_name: kong-ratelimiting
-    environment:
-      KONG_DATABASE: off
-      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong-ratelimiting.yml
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-    volumes:
-      - ./config/kong-ratelimiting.yml:/kong/declarative/kong-ratelimiting.yml
-    ports:
-      - "8003:8000"   # Porta per i client
-    depends_on:
-      - service-ratelimiting
+  service-security:
+    build:
+      context: ./services/service-security/
+    container_name: service-security
     networks:
-      - rate-limiting-network
+      - api-gateway-network
 
-  # ------------
   service-ratelimiting:
     build:
       context: ./services/service-ratelimiting/
     container_name: service-ratelimiting
     networks:
-      - rate-limiting-network
+      - api-gateway-network
 
-
-
-  # ---------------
-  # FAULT TOLERANCE
-  # ---------------
-  kong-faulttolerance:
-    image: kong:latest
-    container_name: kong-faulttolerance
-    environment:
-      KONG_DATABASE: off
-      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong-faulttolerance.yml
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-    volumes:
-      - ./config/kong-faulttolerance.yml:/kong/declarative/kong-faulttolerance.yml
-    ports:
-      - "8004:8000"   # Porta per i client
-    depends_on:
-      - service-faulttolerance
-    networks:
-      - fault-tolerance-network
-
-  # ------------
   service-faulttolerance:
     build:
       context: ./services/service-faulttolerance/
     container_name: service-faulttolerance
     networks:
-      - fault-tolerance-network
-
+      - api-gateway-network
 
 networks:
-  load-balancing-network:
-    driver: bridge
-  rate-limiting-network:
-    driver: bridge
-  fault-tolerance-network:
+  api-gateway-network:
     driver: bridge
