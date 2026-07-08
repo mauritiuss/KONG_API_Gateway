@@ -92,5 +92,5 @@ consumers:
   - username: user-demo
     jwt_secrets:
       - key: user-demo
-        secret: my-jwt-sercret
+        secret: my-jwt-secret
         algorithm: HS256
