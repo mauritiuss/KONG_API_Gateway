@@ -23,6 +23,9 @@ services:
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ADMIN_ERROR_LOG: /dev/stderr
+      # KONG_TRUSTED_IPS: "0.0.0.0/0,::/0"        # --> SOLO PER DIMOSTRAZIONE
+      # KONG_REAL_IP_HEADER: "X-Forwarded-For"    # --> SOLO PER DIMOSTRAZIONE
+      # KONG_REAL_IP_RECURSIVE: "on"              # --> SOLO PER DIMOSTRAZIONE
     volumes:
       - ./config/kong.yml:/kong/declarative/kong.yml
     depends_on:
@@ -45,6 +48,9 @@ services:
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ADMIN_ERROR_LOG: /dev/stderr
+      # KONG_TRUSTED_IPS: "0.0.0.0/0,::/0"        # --> SOLO PER DIMOSTRAZIONE
+      # KONG_REAL_IP_HEADER: "X-Forwarded-For"    # --> SOLO PER DIMOSTRAZIONE
+      # KONG_REAL_IP_RECURSIVE: "on"              # --> SOLO PER DIMOSTRAZIONE
     volumes:
       - ./config/kong.yml:/kong/declarative/kong.yml
     depends_on:

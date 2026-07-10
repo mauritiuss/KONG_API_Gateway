@@ -87,6 +87,7 @@ plugins:
     config:
       minute: 3
       policy: local
+      # limit_by: ip    # --> SOLO PER DIMOSTRAZIONE
 
 consumers:
   - username: user-demo
