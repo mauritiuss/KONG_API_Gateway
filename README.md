@@ -1,65 +1,67 @@
-# KONG_API_Gateway
+# Microservices API Gateway — Kong, Spring Boot & Docker
 
-Progetto universitario dedicato allo sviluppo di un'architettura a microservizi basata su Spring Boot, Kong API Gateway, Nginx e Docker.
+A containerized microservices application demonstrating reliability, security and traffic management patterns in distributed systems.
 
-L'obiettivo è dimostrare alcune delle principali proprietà non funzionali dei sistemi distribuiti, tra cui:
-- Load balancing
-- Fault tolerance
-- High availability
-- JWT Authentication
-- Rate limiting
+Built as an individual university project using **Java 17, Spring Boot, Kong API Gateway, Nginx and Docker Compose**.
 
-La descrizione completa del progetto è disponibile nel file *DOCUMENTAZIONE.md*.
+## Architecture
 
-## Requisiti
-Per eseguire il progetto è necessario:
+The application uses Nginx as its entry point, distributing incoming requests between two Kong API Gateway instances.
+
+Kong routes requests to four independent Spring Boot microservices, each demonstrating a different non-functional property.
+
+**Request flow:**
+
+Client → Nginx → Kong Gateway (2 instances) → Spring Boot Microservices
+
+## Key Features
+
+- **Load Balancing:** Distributes requests across multiple service replicas, using Kong upstreams and health checks.
+- **Fault Tolerance:** Implements circuit breaker and fallback mechanisms with Resilience4j.
+- **High Availability:** Uses two Kong instances behind Nginx to reduce gateway-level single points of failure.
+- **JWT Authentication:** Protects API endpoints through Kong's JWT plugin.
+- **Rate Limiting:** Restricts request frequency through gateway-level policies.
+- **Containerization:** Runs the application components using Docker and Docker Compose.
+
+## Technology Stack
+
+Java 17 · Spring Boot · Maven · Kong API Gateway · Nginx · Docker · Docker Compose · JWT · Resilience4j
+
+## Getting Started
+
+### Requirements
+
 - Docker
-- Docker compose
-- Java 17
-- Maven
+- Docker Compose
 
-## Esecuzione progetto
+### Start the application
 
-### Avvio del progetto
-
-1. Clonare la repository
-2. Costruite le immagini Docker
-   docker compose build
-3. Avviare l'applicazione
-   docker compose up
-   oppure
-   docker compose up --build
-
-### Accesso ai servizi
-Una volta avviato il progetto, tutte le richieste devono essere inviate all'API Gateway tramite:
 ```bash
-http://localhost:8000
+docker compose up --build
 ```
 
-Esempio:
+The API Gateway is available at:
+
+`http://localhost:8000`
+
+### Example Requests
+
 ```bash
 curl http://localhost:8000/loadbalancing
-```
-```bash
 curl http://localhost:8000/ratelimiting
-```
-```bash
 curl http://localhost:8000/faulttolerance
 ```
 
-Per il servizio di autenticazione:
-```bash
-POST /login
-```
-Successivamente sarà possibile utilizzare il JWT ottenuto per acccedere agli endpoint protetti.
+### Stop the application
 
-### Arresto del progetto
-Per fare fermare tutti i container:
 ```bash
 docker compose down
 ```
 
-Per eliminare anche volumi e immagini inutilizzate:
-```bash
-docker compose down -v
-```
+## Technical Documentation
+
+See [DOCUMENTAZIONE.md](DOCUMENTAZIONE.md) for the architecture, microservice responsibilities and implementation details.
+
+## Author
+
+Davide Mauri — University of Milan
